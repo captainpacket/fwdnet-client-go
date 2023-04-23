@@ -1,4 +1,4 @@
-package forwardnetworks
+package fwdnet
 
 import (
 	"crypto/tls"
