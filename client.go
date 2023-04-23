@@ -8,23 +8,35 @@ import (
 	"net/http"
 )
 
-type ForwardNetworksClient struct {
+const HostURL string = "https://fwd.app"
+
+type Client struct {
 	Username string
 	Password string
-	BaseURL  string
+	HostURL  string
 	Insecure bool
 	HttpClient *http.Client
 }
 
-func NewForwardNetworksClient(baseURL, username, password string, insecure bool) *ForwardNetworksClient {
-	httpClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
-		},
+func NewClient(host, username, password *string, insecure bool) (*Client, error) {
+    httpClient := &http.Client{
+        Timeout: 10 * time.Second,
+        Transport: &http.Transport{
+            TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+        },
+    }
+
+	if host != nil {
+		c.HostURL = *host
+	}
+
+	// If username or password not provided, return empty client
+	if username == nil || password == nil {
+		return &c, nil
 	}
 
 	return &ForwardNetworksClient{
-		BaseURL:    baseURL,
+		HostURL:    host,
 		Username:   username,
 		Password:   password,
 		Insecure:   insecure,
