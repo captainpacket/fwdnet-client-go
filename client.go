@@ -34,18 +34,29 @@ func NewClient(host, username, password *string, insecure bool) (*Client, error)
 	if username == nil || password == nil {
 		return &c, nil
 	}
+	
+	c := Client{
+        HTTPClient: httpClient,
+        HostURL:    HostURL, // Default URL
+        Insecure:   insecure,
+    }
 
-	return &ForwardNetworksClient{
-		HostURL:    host,
-		Username:   username,
-		Password:   password,
-		Insecure:   insecure,
-		HttpClient: httpClient,
-	}
+	if host != nil {
+        c.HostURL = *host
+    }
+
+    if username != nil {
+        c.Username = *username
+    }
+
+    if password != nil {
+        c.Password = *password
+    }
+	return &c, nil
 }
 
 
-func (c *ForwardNetworksClient) GetVersion() (string, error) {
+func (c *Client) GetVersion() (string, error) {
 	url := fmt.Sprintf("%s/api/version", c.BaseURL)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
