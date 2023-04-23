@@ -24,7 +24,7 @@ func NewClient(host, username, password *string, insecure bool) (*Client, error)
                 TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
             },
         },
-        // Default Hashicups URL
+        // Default Forward Networks URL
         HostURL: HostURL,
     }
 
