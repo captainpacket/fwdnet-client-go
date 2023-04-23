@@ -2,10 +2,8 @@ package forwardnetworks
 
 import (
 	"crypto/tls"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 const HostURL string = "https://fwd.app"
