@@ -19,31 +19,24 @@ type Client struct {
 }
 
 func NewClient(host, username, password *string, insecure bool) (*Client, error) {
-    httpClient := &http.Client{
-        Timeout: 10 * time.Second,
-        Transport: &http.Transport{
-            TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+    c := Client{
+        HTTPClient: &http.Client{
+            Timeout: 10 * time.Second,
+            Transport: &http.Transport{
+                TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+            },
         },
+        // Default Hashicups URL
+        HostURL: HostURL,
     }
 
-	if host != nil {
-		c.HostURL = *host
-	}
-
-	// If username or password not provided, return empty client
-	if username == nil || password == nil {
-		return &c, nil
-	}
-	
-	c := Client{
-        HTTPClient: httpClient,
-        HostURL:    HostURL, // Default URL
-        Insecure:   insecure,
-    }
-
-	if host != nil {
+    if host != nil {
         c.HostURL = *host
     }
+	
+    if username == nil || password == nil {
+		return &c, nil
+	}
 
     if username != nil {
         c.Username = *username
@@ -52,43 +45,8 @@ func NewClient(host, username, password *string, insecure bool) (*Client, error)
     if password != nil {
         c.Password = *password
     }
-	return &c, nil
+
+
+
+    return &c, nil
 }
-
-
-func (c *Client) GetVersion() (string, error) {
-	url := fmt.Sprintf("%s/api/version", c.BaseURL)
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return "", err
-	}
-
-	req.SetBasicAuth(c.Username, c.Password)
-
-	resp, err := c.HttpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("API request failed with status code %d", resp.StatusCode)
-	}
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	var versionData struct {
-		Version string `json:"version"`
-	}
-	err = json.Unmarshal(bodyBytes, &versionData)
-	if err != nil {
-		return "", err
-	}
-
-	return versionData.Version, nil
-}
-
